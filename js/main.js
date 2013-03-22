@@ -116,6 +116,7 @@ window.addEventListener("DOMContentLoaded", function(){
 		for(var i=0, j=localStorage.length; i<j; i++){
 			
 			var createLi = document.createElement('li');
+			var linksLi = document.createElement('li');
 			createList.appendChild(createLi);
 			var key = localStorage.key(i);
 			var value = localStorage.getItem(key);
@@ -128,10 +129,106 @@ window.addEventListener("DOMContentLoaded", function(){
 				createSubList.appendChild(createSubLi);
 				var optSubText = reObj[n][0]+" "+reObj[n][1];
 				createSubLi.innerHTML = optSubText;
-				
+				createSubList.appendChild(linksLi);
 			}
 			
+			createItemLinks(localStorage.key(i), linksLi);
 		}
+		
+	}
+	
+	//Create Item Links - Creates Edit and Delete links for stored items when displayed
+	function createItemLinks(key, linksLi){
+		
+		//edit link
+		var editLink = document.createElement('a');
+		editLink.href = "#";
+		editLink.key = key;
+		var editText = "Edit Reminder";
+		editLink.addEventListener("click", editItem);
+		editLink.innerHTML = editText;
+		linksLi.appendChild(editLink);
+		
+		//Line Break
+		var lineBreak = document.createElement('br');
+		linksLi.appendChild(lineBreak);
+		
+		//delete link
+		var deleteLink = document.createElement('a');
+		deleteLink.href = "#";
+		deleteLink.key = key;
+		var deleteText = "Delete Reminder";
+		//deleteLink.addEventListener("click", nil);
+		deleteLink.innerHTML = deleteText;
+		linksLi.appendChild(deleteLink);
+		
+	}
+	
+	function editItem(){
+		
+		// Get data from Local Storage
+		var value = localStorage.getItem(this.key);
+		var reminder = JSON.parse(value);
+		
+		
+		toggleControl("off");
+		
+		$('groups').value = reminder.group[1];
+		$('due').value = reminder.dueDate[1];
+		$('recurrence').value = reminder.recurrence[1];
+		$('description').value = reminder.description[1];
+		
+		if(reminder.priority[1] == "Yes"){
+			
+			$('priority').setAttribute("checked", "checked");
+		}
+		
+		//remove listener from input save button
+		save.removeEventListener("click", saveData);
+		
+		//Change Submit button value to edit button
+		$('submit').value = "Edit Contact";
+		var editSubmit = $('submit');
+		
+		//Save the key created
+		editSubmit.addEventListener("click", validate);
+		editSubmit.key = this.key;
+		
+	}
+	
+	function validate(){
+	
+		var getDueDate = $('due');
+		var getRecurrence = $('recurrence');
+		var getTitle = $('remindTitle');
+		
+		if (getTitle.value === ""){
+			
+			var titleError = "Please Enter a title.";
+			getTitle.style.border = "1px solid red";
+			messageAry.push(titleError);
+		
+			
+		}
+		
+		if (getDueDate.value === ""){
+			
+			var dueError = "Please Enter a Due Date.";
+			getDueDate.style.border = "1px solid red";
+			messageAry.push(dueError);
+		
+			
+		}
+		
+		if (getRecurrence.value === "0"){
+			
+			var dueError = "Please Enter a title.";
+			getDueDate.style.border = "1px solid red";
+			messageAry.push(dueError);
+		
+			
+		}
+
 		
 	}
 	

@@ -73,9 +73,14 @@ window.addEventListener("DOMContentLoaded", function(){
 			}
 	}
 	
-	function saveData(){
+	function saveData(key){
+		if(!key){
 		
-		var id = Math.floor(Math.random()*100000001);
+			var id = Math.floor(Math.random()*100000001);
+		}else{
+			
+			id = key;
+		}
 		
 		getSelectedRadio();
 		
@@ -158,9 +163,26 @@ window.addEventListener("DOMContentLoaded", function(){
 		deleteLink.href = "#";
 		deleteLink.key = key;
 		var deleteText = "Delete Reminder";
-		//deleteLink.addEventListener("click", nil);
+		deleteLink.addEventListener("click", deleteItem);
 		deleteLink.innerHTML = deleteText;
 		linksLi.appendChild(deleteLink);
+		
+	}
+	
+	function deleteItem(){
+		
+		var verify = confirm("Are you sure you want to delete this reminder?");
+		
+		if(verify){
+			
+			localStorage.removeItem(this.key);
+			alert("Contact was deleted!");
+			window.location.reload();
+			
+		}else{
+			
+			alert("Reminder was NOT deleted.");
+		}
 		
 	}
 	
@@ -196,17 +218,27 @@ window.addEventListener("DOMContentLoaded", function(){
 		
 	}
 	
-	function validate(){
+	function validate(eventData){
 	
 		var getDueDate = $('due');
 		var getRecurrence = $('recurrence');
 		var getTitle = $('remindTitle');
 		
+		//reset error
+		errorMsg.innerHTML = "";
+		getTitle.style.border = "1px solid black";
+		getDueDate.style.border = "1px solid black";
+		getDueDate.style.border = "1px solid black";
+
+
+		
+		var messageError = [];
+		
 		if (getTitle.value === ""){
 			
 			var titleError = "Please Enter a title.";
 			getTitle.style.border = "1px solid red";
-			messageAry.push(titleError);
+			messageError.push(titleError);
 		
 			
 		}
@@ -215,19 +247,40 @@ window.addEventListener("DOMContentLoaded", function(){
 			
 			var dueError = "Please Enter a Due Date.";
 			getDueDate.style.border = "1px solid red";
-			messageAry.push(dueError);
+			messageError.push(dueError);
 		
 			
 		}
 		
 		if (getRecurrence.value === "0"){
 			
-			var dueError = "Please Enter a title.";
-			getDueDate.style.border = "1px solid red";
-			messageAry.push(dueError);
+			var dueError = "Please set the likelihood of recurrence.";
+			getRecurrence.style.border = "1px solid red";
+			messageError.push(dueError);
 		
 			
 		}
+		
+		if(messageError.length >= 1){
+			
+			for(var i=0, j=messageError.length; i<j; i++){
+				
+				var text = document.createElement('li');
+				text.innerHTML = messageError[i];
+				errorMsg.appendChild(text);
+			}
+			
+			
+			
+		}else{
+			saveData(this.key);
+			
+		}
+		
+		eventData.preventDefault();
+		
+		return false;
+		
 
 		
 	}
@@ -249,7 +302,8 @@ window.addEventListener("DOMContentLoaded", function(){
 	}
 	
 	//Array
-	var catGroups =["Personal", "Work", "Other"], priorityValue;
+	var catGroups =["Personal", "Work", "Other"], priorityValue; 
+	var errorMsg = $('errors');
 	createGroups();
 	
 	
